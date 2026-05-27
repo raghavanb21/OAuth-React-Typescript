@@ -13,11 +13,7 @@ Then open [http://localhost:5173](http://localhost:5173).
 
 ## Google OAuth Setup
 
-Copy `.env.example` to `.env` and add your client ID:
-
-```bash
-cp .env.example .env
-```
+Sample `.env`
 
 ```env
 VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
