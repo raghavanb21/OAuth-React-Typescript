@@ -1,2 +1,9 @@
 .DS_Store
 CLAUDE.md
+
+# env (contains secrets)
+.env
+
+# deps & build
+node_modules/
+dist/

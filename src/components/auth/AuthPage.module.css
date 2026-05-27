@@ -1,0 +1,122 @@
+.bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(168, 85, 247, 0.45) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 15%, rgba(59, 130, 246, 0.4) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 90%, rgba(236, 72, 153, 0.35) 0%, transparent 45%),
+    linear-gradient(160deg, #0d0221 0%, #150535 50%, #0d0221 100%);
+}
+
+.orb1, .orb2, .orb3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  animation: drift 9s ease-in-out infinite alternate;
+}
+.orb1 {
+  width: 560px; height: 560px;
+  background: rgba(168, 85, 247, 0.45);
+  top: -20%; left: -12%;
+}
+.orb2 {
+  width: 400px; height: 400px;
+  background: rgba(59, 130, 246, 0.4);
+  bottom: -10%; right: 2%;
+  animation-delay: -4s;
+  animation-duration: 12s;
+}
+.orb3 {
+  width: 300px; height: 300px;
+  background: rgba(236, 72, 153, 0.4);
+  top: 30%; right: 12%;
+  animation-delay: -7s;
+  animation-duration: 7s;
+}
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(40px, -30px) scale(1.1); }
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 448px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(168, 85, 247, 0.1);
+}
+
+.header { margin-bottom: 32px; }
+
+.brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+.brand span {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tagline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.tab {
+  flex: 1;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+  transition: all 0.2s;
+}
+.tabActive {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.35), rgba(236, 72, 153, 0.25));
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.formWrap {
+  animation: fadeUp 0.22s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .card { padding: 28px 20px; border-radius: 20px; }
+}
