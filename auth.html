@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vela — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --ink2: #2a2a2a;
+    --ink3: #555;
+    --ink4: #999;
+    --paper: #faf9f7;
+    --paper2: #f2f0ec;
+    --paper3: #e8e5df;
+    --accent: #c8593a;
+    --accent2: #a8432a;
+    --line: rgba(15,15,15,0.1);
+    --r: 4px;
+    --trans: 0.18s cubic-bezier(0.4,0,0.2,1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* LEFT PANEL */
+  .panel-left {
+    width: 420px;
+    flex-shrink: 0;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 52px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-left::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .panel-left::after {
+    content: '';
+    position: absolute;
+    bottom: -120px; left: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+    color: var(--paper);
+    position: relative;
+  }
+  .brand span { color: var(--accent); }
+  .panel-tagline {
+    position: relative;
+    z-index: 1;
+  }
+  .panel-tagline h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    color: var(--paper);
+    margin-bottom: 16px;
+  }
+  .panel-tagline h2 em {
+    font-style: italic;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-tagline p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.7;
+    max-width: 280px;
+  }
+  .panel-footer {
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* RIGHT PANEL */
+  .panel-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px;
+  }
+  .form-shell {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 36px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 12px 0;
+    margin-right: 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink4);
+    position: relative;
+    transition: color var(--trans);
+    letter-spacing: 0.01em;
+  }
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 2px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transition: transform var(--trans);
+    transform-origin: left;
+  }
+  .tab-btn.active { color: var(--ink); }
+  .tab-btn.active::after { transform: scaleX(1); }
+
+  /* FORM */
+  .form-panel { display: none; animation: fadeUp 0.28s ease both; }
+  .form-panel.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-group { margin-bottom: 18px; }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 6px;
+  }
+  input[type=text], input[type=email], input[type=password] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--paper3);
+    border-radius: var(--r);
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color var(--trans), box-shadow var(--trans);
+    -webkit-appearance: none;
+  }
+  input:focus {
+    border-color: var(--ink2);
+    box-shadow: 0 0 0 3px rgba(15,15,15,0.06);
+  }
+  input.error { border-color: var(--accent); }
+  .field-error {
+    font-size: 12px;
+    color: var(--accent);
+    margin-top: 5px;
+    display: none;
+  }
+  .field-error.show { display: block; }
+
+  /* PASSWORD STRENGTH */
+  .pw-strength { margin-top: 8px; }
+  .pw-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+  .pw-bar {
+    flex: 1; height: 2px;
+    border-radius: 2px;
+    background: var(--paper3);
+    transition: background 0.3s;
+  }
+  .pw-bar.weak { background: var(--accent); }
+  .pw-bar.fair { background: #d4911a; }
+  .pw-bar.good { background: #4a9e6b; }
+  .pw-label { font-size: 11px; color: var(--ink4); }
+
+  /* CHECKBOX */
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 22px;
+    cursor: pointer;
+  }
+  .check-row input[type=checkbox] {
+    width: 15px; height: 15px;
+    accent-color: var(--ink);
+    cursor: pointer;
+  }
+  .check-row span { font-size: 13px; color: var(--ink3); }
+
+  /* BUTTON */
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: var(--r);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background var(--trans), transform 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary:hover { background: var(--ink2); }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary .spinner {
+    display: none;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin: 0 auto;
+  }
+  .btn-primary.loading .btn-text { display: none; }
+  .btn-primary.loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* DIVIDER */
+  .or-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0;
+    color: var(--ink4);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+  .or-divider::before, .or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* GOOGLE BUTTON */
+  .btn-google {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--paper);
+    color: var(--ink2);
+    border: 1px solid var(--paper3);
+    border-radius: var(--r);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: border-color var(--trans), background var(--trans);
+  }
+  .btn-google:hover { background: var(--paper2); border-color: var(--paper3); }
+  .btn-google svg { flex-shrink: 0; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 11px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 400;
+    white-space: nowrap;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 100;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error-toast { background: var(--accent); }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .panel-left { display: none; }
+    body { display: block; }
+    .panel-right { padding: 48px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<aside class="panel-left">
+  <div class="brand">Vela<span>.</span></div>
+  <div class="panel-tagline">
+    <h2>Welcome<br><em>back</em> to<br>your space.</h2>
+    <p>A calm, focused place to do your best thinking. Sign in to continue where you left off.</p>
+  </div>
+  <div class="panel-footer">© 2026 Vela · No trackers, no ads.</div>
+</aside>
+
+<main class="panel-right">
+  <div class="form-shell">
+
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('login', this)">Sign in</button>
+      <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('signup', this)">Create account</button>
+    </nav>
+
+    <!-- LOGIN -->
+    <div id="panel-login" class="form-panel active" role="tabpanel">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+        <p class="field-error" id="login-email-err"></p>
+      </div>
+      <div class="form-group">
+        <label for="login-pw">Password</label>
+        <input type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password">
+        <p class="field-error" id="login-pw-err"></p>
+      </div>
+      <label class="check-row">
+        <input type="checkbox" id="remember-me">
+        <span>Remember me</span>
+      </label>
+      <button class="btn-primary" id="btn-login" onclick="handleLogin()">
+        <span class="btn-text">Sign in</span>
+        <span class="spinner"></span>
+      </button>
+      <div class="or-divider">or</div>
+      <button class="btn-google" onclick="triggerGoogleAuth()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="panel-signup" class="form-panel" role="tabpanel">
+      <div class="form-group">
+        <label for="su-name">Full name</label>
+        <input type="text" id="su-name" placeholder="Ada Lovelace" autocomplete="name">
+        <p class="field-error" id="su-name-err"></p>
+      </div>
+      <div class="form-group">
+        <label for="su-email">Email</label>
+        <input type="email" id="su-email" placeholder="you@example.com" autocomplete="email">
+        <p class="field-error" id="su-email-err"></p>
+      </div>
+      <div class="form-group">
+        <label for="su-pw">Password</label>
+        <input type="password" id="su-pw" placeholder="••••••••" oninput="checkStrength(this.value)" autocomplete="new-password">
+        <div class="pw-strength" id="pw-strength" style="display:none">
+          <div class="pw-bars">
+            <div class="pw-bar" id="bar1"></div>
+            <div class="pw-bar" id="bar2"></div>
+            <div class="pw-bar" id="bar3"></div>
+            <div class="pw-bar" id="bar4"></div>
+          </div>
+          <span class="pw-label" id="pw-label"></span>
+        </div>
+        <p class="field-error" id="su-pw-err"></p>
+      </div>
+      <div class="form-group">
+        <label for="su-pw2">Confirm password</label>
+        <input type="password" id="su-pw2" placeholder="••••••••" autocomplete="new-password">
+        <p class="field-error" id="su-pw2-err"></p>
+      </div>
+      <button class="btn-primary" id="btn-signup" onclick="handleSignup()" style="margin-top:4px">
+        <span class="btn-text">Create account</span>
+        <span class="spinner"></span>
+      </button>
+      <div class="or-divider">or</div>
+      <button class="btn-google" onclick="triggerGoogleAuth()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        Sign up with Google
+      </button>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID_HERE';
+
+/* ── Tab switching ── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+  const panel = document.getElementById('panel-'+id);
+  panel.classList.add('active');
+  panel.style.animation = 'none';
+  requestAnimationFrame(() => { panel.style.animation = ''; });
+}
+
+/* ── Toast ── */
+let toastTimer;
+function showToast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error-toast', err);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ── Field helpers ── */
+function setErr(id, msg) {
+  const input = document.getElementById(id);
+  const err = document.getElementById(id+'-err');
+  if (input) input.classList.toggle('error', !!msg);
+  if (err) { err.textContent = msg; err.classList.toggle('show', !!msg); }
+}
+function clearErrs(...ids) { ids.forEach(id => setErr(id, '')); }
+
+/* ── Password strength ── */
+function checkStrength(val) {
+  const wrap = document.getElementById('pw-strength');
+  if (!val) { wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const bars = ['bar1','bar2','bar3','bar4'];
+  const cls = score <= 1 ? 'weak' : score === 2 ? 'fair' : 'good';
+  const labels = ['','Weak','Fair','Good','Strong'];
+  bars.forEach((b,i) => {
+    const el = document.getElementById(b);
+    el.className = 'pw-bar';
+    if (i < score) el.classList.add(cls);
+  });
+  document.getElementById('pw-label').textContent = labels[score] || '';
+}
+
+/* ── Crypto hash ── */
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ── Session ── */
+function createSession(user) {
+  const token = crypto.randomUUID();
+  sessionStorage.setItem('vela_token', token);
+  sessionStorage.setItem('vela_user', JSON.stringify(user));
+  return token;
+}
+
+/* ── Sign up ── */
+async function handleSignup() {
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim().toLowerCase();
+  const pw = document.getElementById('su-pw').value;
+  const pw2 = document.getElementById('su-pw2').value;
+  clearErrs('su-name','su-email','su-pw','su-pw2');
+  let ok = true;
+  if (!name) { setErr('su-name', 'Name is required'); ok = false; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('su-email','Enter a valid email'); ok = false; }
+  if (pw.length < 8) { setErr('su-pw','At least 8 characters'); ok = false; }
+  if (pw !== pw2) { setErr('su-pw2','Passwords do not match'); ok = false; }
+  if (!ok) return;
+
+  const users = JSON.parse(localStorage.getItem('vela_users') || '{}');
+  if (users[email]) { setErr('su-email','An account with this email already exists'); return; }
+
+  const btn = document.getElementById('btn-signup');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  const hash = await sha256(pw);
+  users[email] = { name, email, hash, method: 'email', joined: Date.now() };
+  localStorage.setItem('vela_users', JSON.stringify(users));
+
+  setTimeout(() => {
+    createSession({ name, email, method: 'email' });
+    showToast('Account created! Redirecting…');
+    setTimeout(() => { window.location.href = 'welcome.html'; }, 900);
+  }, 600);
+}
+
+/* ── Login ── */
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pw = document.getElementById('login-pw').value;
+  clearErrs('login-email','login-pw');
+  let ok = true;
+  if (!email) { setErr('login-email','Email is required'); ok = false; }
+  if (!pw) { setErr('login-pw','Password is required'); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById('btn-login');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  const users = JSON.parse(localStorage.getItem('vela_users') || '{}');
+  const hash = await sha256(pw);
+
+  setTimeout(async () => {
+    if (!users[email] || users[email].hash !== hash) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      setErr('login-pw','Incorrect email or password');
+      return;
+    }
+    const u = users[email];
+    if (document.getElementById('remember-me').checked) {
+      localStorage.setItem('vela_remember', JSON.stringify({ name: u.name, email, method: u.method }));
+    }
+    createSession({ name: u.name, email, method: u.method });
+    showToast('Welcome back, ' + u.name.split(' ')[0] + '!');
+    setTimeout(() => { window.location.href = 'welcome.html'; }, 900);
+  }, 700);
+}
+
+/* ── Google OAuth ── */
+window.handleGoogleCredential = function(response) {
+  try {
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    const email = payload.email.toLowerCase();
+    const name = payload.name || email.split('@')[0];
+    const users = JSON.parse(localStorage.getItem('vela_users') || '{}');
+    if (!users[email]) {
+      users[email] = { name, email, method: 'google', joined: Date.now() };
+      localStorage.setItem('vela_users', JSON.stringify(users));
+    }
+    createSession({ name, email, method: 'google', picture: payload.picture });
+    showToast('Signed in with Google!');
+    setTimeout(() => { window.location.href = 'welcome.html'; }, 900);
+  } catch (e) {
+    showToast('Google sign-in failed. Try again.', true);
+  }
+};
+
+function triggerGoogleAuth() {
+  if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+    showToast('Add your Google Client ID to enable OAuth', true);
+    return;
+  }
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleCredential
+  });
+  google.accounts.id.prompt();
+}
+
+/* ── Auto-fill remembered email ── */
+(function() {
+  const rem = JSON.parse(localStorage.getItem('vela_remember') || 'null');
+  if (rem) document.getElementById('login-email').value = rem.email;
+})();
+
+/* ── Enter key submit ── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('panel-login').classList.contains('active')) handleLogin();
+  else handleSignup();
+});
+</script>
+</body>
+</html>
