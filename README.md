@@ -1,6 +1,6 @@
 # Credly
 
-A minimal client-side authentication demo — sign up, log in, and view a personal dashboard. No backend, no build step, no dependencies.
+A minimal client-side authentication demo - sign up, log in, and view a personal dashboard. No backend, no build step, no dependencies.
 
 ## Getting Started
 
